@@ -3,3 +3,17 @@ processed_rldd/
 
 
 
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Datasets and model outputs (never commit; share via Drive/Kaggle)
+data/
+datasets/
+checkpoints/
+runs/
+*.pt
+*.pth
+*.onnx
+*.npz
