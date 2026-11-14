@@ -106,10 +106,12 @@ def discover_videos(rldd_dir, include_low_vigilant=True):
     records = []
     for dirpath, _, filenames in os.walk(rldd_dir):
         for fname in filenames:
+            # 1. Case-insensitive extension check
             if not fname.lower().endswith(VIDEO_EXTENSIONS):
                 continue
 
             stem = os.path.splitext(fname)[0]
+            # Handle uppercase stem if necessary (e.g. "10" vs "10")
             if stem not in LABEL_MAP:
                 continue
             if stem == "5" and not include_low_vigilant:
@@ -118,7 +120,10 @@ def discover_videos(rldd_dir, include_low_vigilant=True):
             full_path = os.path.join(dirpath, fname)
             parts = os.path.normpath(full_path).split(os.sep)
 
+            # 2. Extract subject_id (immediate parent folder, e.g., '01')
             subject_id = parts[-2]
+
+            # 3. Extract fold_id safely by finding any path component starting with 'Fold'
             fold_id = next((p.split("_")[0] for p in parts if p.startswith("Fold")), "Unknown")
 
             records.append({
