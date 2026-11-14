@@ -1,0 +1,13 @@
+# R4 (eye and mouth cues) configuration.
+# Paths are NOT stored here: pass them on the command line so this file
+# works on every teammate's machine.
+
+mouth:
+  fps: 15.0              # features are computed at the pipeline rate
+  min_calib_frames: 30   # need >= 2 s of valid frames to calibrate
+  open_ratio: 1.6        # mar / neutral_mar above this = mouth wide open
+  talk_ratio: 1.15       # upward crossings of this = one talking cycle
+  yawn_peak_ratio: 2.0   # a yawn must reach at least this ratio
+  min_yawn_s: 1.5        # ... and stay wide open at least this long
+  osc_window_s: 2.0      # window for open/close oscillation rate
+  max_gap_s: 0.5         # tolerated face-lost gap inside a yawn (hand over mouth)

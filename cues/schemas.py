@@ -32,6 +32,9 @@ FRAME_FEATURE_KEYS: tuple[str, ...] = (
     "mar",               # outer-lip MAR, same formula as R3's RLDD archives
     "mar_inner",         # inner-lip MAR (actual opening)
     "mar_norm",          # mar / driver's calibrated neutral MAR (NaN before calibration)
+    "mouth_open_run_s",  # seconds the mouth has been continuously wide open
+    "mouth_osc_hz",      # open/close cycles per second over the last 2 s (talking is high)
+    "yawn_flag",         # 1.0 while the rule-based yawn detector fires, else 0.0
     "eye_brightness",    # quality signals, mean over valid eyes (R3-compatible)
     "eye_contrast",
     "eye_glare_frac",
@@ -68,6 +71,10 @@ class MouthResult:
     mar_inner: float = NAN
     mar_norm: float = NAN
     valid: bool = False
+    # Temporal yawn features (NaN until the driver is calibrated).
+    open_run_s: float = NAN
+    osc_hz: float = NAN
+    yawn_flag: float = NAN
 
 
 @dataclass
@@ -89,6 +96,11 @@ class R4FrameOutput:
             "mar": self.mouth.mar if self.mouth.valid else NAN,
             "mar_inner": self.mouth.mar_inner if self.mouth.valid else NAN,
             "mar_norm": self.mouth.mar_norm if self.mouth.valid else NAN,
+            # Temporal features are kept even on face-lost frames: they carry
+            # state (e.g. a yawn in progress while a hand covers the mouth).
+            "mouth_open_run_s": self.mouth.open_run_s,
+            "mouth_osc_hz": self.mouth.osc_hz,
+            "yawn_flag": self.mouth.yawn_flag,
             "eye_brightness": b, "eye_contrast": c,
             "eye_glare_frac": g, "eye_sharpness": s,
         }
@@ -116,8 +128,10 @@ class EyeStatePredictorAPI(Protocol):
 
 
 class MouthCueExtractorAPI(Protocol):
-    def compute(self, landmarks_px: np.ndarray) -> MouthResult:
-        """landmarks_px: (478, 3) from landmarks.landmarks_to_array."""
+    def update(self, landmarks_px: Optional[np.ndarray]) -> MouthResult:
+        """Process one frame (call at a steady 15 FPS).
+        landmarks_px: (478, 3) from landmarks.landmarks_to_array, or None if
+        no face was found. Returns MAR values and temporal yawn features."""
         ...
 
     def calibrate(self, neutral_mar_values: Sequence[float]) -> float:
