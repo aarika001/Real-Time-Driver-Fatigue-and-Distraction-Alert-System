@@ -55,7 +55,7 @@ class EyeResult:
     @property
     def p_closed(self) -> float:
         vals = [p for p, ok in ((self.p_closed_left, self.valid_left),
-                                (self.p_closed_right, self.valid_right)) if ok]
+                                (self.p_closed_right, self.valid_right)) if ok and not math.isnan(p)]
         return float(np.mean(vals)) if vals else NAN
 
     def mean_quality(self) -> list[float]:
