@@ -7,6 +7,7 @@ PyTorch; the ONNX export test runs only where torch + onnxruntime exist.
 from __future__ import annotations
 
 import importlib.util
+import sys
 import json
 from pathlib import Path
 
@@ -42,6 +43,7 @@ class FakePredictor:
 def _script(name):
     spec = importlib.util.spec_from_file_location(name, REPO_ROOT / "scripts" / "r4" / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod      # dataclasses need the module registered (Python 3.13)
     spec.loader.exec_module(mod)
     return mod
 

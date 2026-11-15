@@ -7,6 +7,7 @@ Run from the repo root:  python -m pytest tests/r4 -v
 from __future__ import annotations
 
 import importlib.util
+import sys
 import zipfile
 from pathlib import Path
 
@@ -203,6 +204,7 @@ def test_train_script_smoke_run(tmp_path):
     base = make_fake_mrl(tmp_path / "data", n_subjects=8, per_subject=24)
     spec = importlib.util.spec_from_file_location("train_eye_cnn", REPO_ROOT / "scripts" / "r4" / "train_eye_cnn.py")
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod      # dataclasses need the module registered (Python 3.13)
     spec.loader.exec_module(mod)
     out = tmp_path / "run"
     assert mod.main(["--mrl_root", str(base), "--out_dir", str(out), "--smoke", "--cpu", "--num_workers", "0"]) == 0

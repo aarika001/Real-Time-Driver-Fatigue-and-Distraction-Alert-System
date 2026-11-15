@@ -200,6 +200,7 @@ def test_annotations_and_ground_truth_rules(tmp_path):
 def _load_script(name: str):
     spec = importlib.util.spec_from_file_location(name, REPO_ROOT / "scripts" / "r4" / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod      # dataclasses need the module registered (Python 3.13)
     spec.loader.exec_module(mod)
     return mod
 
