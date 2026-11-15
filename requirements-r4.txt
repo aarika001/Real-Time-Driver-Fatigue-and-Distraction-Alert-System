@@ -1,0 +1,13 @@
+# R4 (eye and mouth cues). Install with: pip install -r requirements-r4.txt
+numpy
+opencv-python
+mediapipe
+pandas
+pyyaml
+scikit-learn
+matplotlib
+pytest
+torch
+torchvision
+onnx
+onnxruntime

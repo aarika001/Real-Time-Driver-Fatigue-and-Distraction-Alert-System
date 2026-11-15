@@ -1,0 +1,41 @@
+# R4 (eye and mouth cues) configuration.
+# Paths are NOT stored here: pass them on the command line so this file
+# works on every teammate's machine.
+
+mouth:
+  fps: 15.0              # features are computed at the pipeline rate
+  min_calib_frames: 30   # need >= 2 s of valid frames to calibrate
+  open_ratio: 1.6        # mar / neutral_mar above this = mouth wide open
+  talk_ratio: 1.15       # upward crossings of this = one talking cycle
+  yawn_peak_ratio: 2.0   # a yawn must reach at least this ratio
+  min_yawn_s: 1.5        # ... and stay wide open at least this long
+  osc_window_s: 2.0      # window for open/close oscillation rate
+  max_gap_s: 0.5         # tolerated face-lost gap inside a yawn (hand over mouth)
+
+eye_model:
+  input_size: 96         # 64x64 crops are upsampled to this inside the network
+  width_mult: 1.0        # ImageNet weights exist only for 1.0
+  dropout: 0.2
+  pretrained: true       # transfer learning from ImageNet
+
+eye_train:
+  epochs: 15
+  batch_size: 256
+  lr: 0.0005
+  weight_decay: 0.0001
+  warmup_epochs: 1       # linear warm-up, then cosine decay
+  freeze_epochs: 1       # train only the new head first so it does not wreck pretrained filters
+  patience: 4            # early stopping on validation AUROC
+  val_subjects: 5        # people held out for validation (per dataset, scaled for small sets)
+  test_subjects: 7       # people held out for the final test
+  seed: 42
+
+eye_augment:             # probabilities of each in-cabin degradation (see cues/augment.py)
+  p_affine: 0.7
+  p_flip: 0.5
+  p_gamma: 0.6
+  p_contrast: 0.4
+  p_noise: 0.3
+  p_blur: 0.3
+  p_glare: 0.3
+  p_occlusion: 0.25
