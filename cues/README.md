@@ -12,8 +12,8 @@ R7 (reliability) and R8 (live app).
 | M2 | `mouth_cue.py` (MAR, per-driver baseline, yawn features) + YawDD scripts | done |
 | M3 | `eye_dataset.py`, `augment.py`, `eye_metrics.py` (loaders, augmentation, subject splits, metrics) | done |
 | M4 | `eye_model.py`, `scripts/r4/train_eye_cnn.py`, Kaggle notebook (MobileNetV2) | done |
-| M5 | `eval_eye_cnn.py` (per-condition, cross-dataset, baseline B2) | planned |
-| M6 | `inference_r4.py` (≥15 FPS, ONNX, webcam test) | planned |
+| M5 | `scripts/r4/eval_eye_cnn.py`, `perclos.py`, `stress.py` (per-condition, stress, cross-dataset, RLDD + baseline B2) | done |
+| M6 | `inference_r4.py`, `predictors.py`, `scripts/r4/export_onnx.py`, `scripts/r4/webcam_demo.py` | done |
 
 ## Compatibility with R3's processed RLDD data
 
@@ -97,6 +97,36 @@ from cues.eye_model import EyeStatePredictor
 pred = EyeStatePredictor("runs/eye_cnn/best.pt")        # checkpoint is shared via Drive, not git
 p_closed = pred.predict_crops(np.stack([left_crop, right_crop]))
 ```
+
+## Evaluation (M5)
+
+```bash
+python scripts/r4/eval_eye_cnn.py --eye_model runs/eye_cnn/eye_cnn.onnx --splits runs/eye_cnn/splits.csv \
+    --mrl_root <MRL folder or zip> [--extra_index rgb_crops.csv] [--rldd_dir data/processed_rldd] \
+    --out_dir results/r4/eye_eval
+```
+
+Writes `report.md`: per-condition results on unseen people, graded stress tests
+(low light, glare, blur, occlusion, noise), cross-dataset results, and on UTA-RLDD the
+per-video PERCLOS with Baseline B2 (CNN + PERCLOS rule).
+
+## Live pipeline for R8 (M6)
+
+```python
+from cues.inference_r4 import R4Pipeline
+from cues.predictors import load_eye_predictor
+pipe = R4Pipeline(eye_predictor=load_eye_predictor("eye_cnn.onnx"))   # .onnx or .pt
+pipe.start_calibration(); ...; pipe.finish_calibration()             # R6 calibration stage
+res = pipe.process_frame(frame_bgr, timestamp_s)
+features = res.output.to_flat_dict()      # timings in res.timings_ms
+```
+
+```bash
+python scripts/r4/export_onnx.py --checkpoint runs/eye_cnn/best.pt --out runs/eye_cnn/eye_cnn.onnx
+python scripts/r4/webcam_demo.py --eye_model runs/eye_cnn/eye_cnn.onnx     # c = calibrate, q = quit
+```
+
+The webcam script prints per-stage latency and FPS and saves them to `results/r4/fps_report.json`.
 
 ## Run the tests
 
