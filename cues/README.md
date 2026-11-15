@@ -10,8 +10,8 @@ R7 (reliability) and R8 (live app).
 |---|---|---|
 | M1 | `landmarks.py`, `eye_crop.py`, `schemas.py` (interface contract) | done |
 | M2 | `mouth_cue.py` (MAR, per-driver baseline, yawn features) + YawDD scripts | done |
-| M3 | `eye_dataset.py` (MRL Eye / NTHU-DDD / DMD loaders, augmentation) | planned |
-| M4 | `train_eye_cnn.py` (MobileNetV2) | planned |
+| M3 | `eye_dataset.py`, `augment.py`, `eye_metrics.py` (loaders, augmentation, subject splits, metrics) | done |
+| M4 | `eye_model.py`, `scripts/r4/train_eye_cnn.py`, Kaggle notebook (MobileNetV2) | done |
 | M5 | `eval_eye_cnn.py` (per-condition, cross-dataset, baseline B2) | planned |
 | M6 | `inference_r4.py` (≥15 FPS, ONNX, webcam test) | planned |
 
@@ -72,6 +72,31 @@ python scripts/r4/eval_yawdd.py --features_dir data/yawdd_mar --annotations <R2 
 ```
 
 Annotation CSV columns: `video_id,start_s,end_s` (video file name without extension).
+
+## Eye-state CNN (M3–M4)
+
+* Data: MRL Eye (84,898 IR crops, 37 people; labels in file names) + optional extra labelled
+  crops via a CSV with `path, subject_id, label_closed` (+ `glasses`, `reflection`, `lighting`, `sensor`).
+* Splits are by person: 25 train / 5 val / 7 test people for MRL (`splits.csv` is saved with every run,
+  `group_kfold_assign` gives R3 person-level folds).
+* Per image: resize to 64×64 → augmentation (training only) → CLAHE → MobileNetV2.
+  Augmentations run before CLAHE because real degradations happen in the camera.
+* Training: ImageNet MobileNetV2, 1 head-only epoch, AdamW + warm-up + cosine LR, class-balanced
+  BCE, mixed precision on GPU, early stopping on validation AUROC, temperature scaling on the validation
+  people so P(closed) is calibrated.
+
+```bash
+python scripts/r4/train_eye_cnn.py --mrl_root <MRL folder or zip> --out_dir runs/eye_cnn          # GPU
+python scripts/r4/train_eye_cnn.py --mrl_root <MRL folder or zip> --out_dir runs/smoke --smoke    # 1-min check
+```
+
+Kaggle: `notebooks/r4_train_eye_kaggle.ipynb` clones this repo and runs tests + training.
+
+```python
+from cues.eye_model import EyeStatePredictor
+pred = EyeStatePredictor("runs/eye_cnn/best.pt")        # checkpoint is shared via Drive, not git
+p_closed = pred.predict_crops(np.stack([left_crop, right_crop]))
+```
 
 ## Run the tests
 
