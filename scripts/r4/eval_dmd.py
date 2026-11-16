@@ -233,8 +233,11 @@ def main(argv: Optional[list[str]] = None, pipeline_factory=None) -> int:
     ap.add_argument("--calib_s", type=float, default=30.0, help="per-session mouth calibration window")
     ap.add_argument("--tolerance_s", type=float, default=1.0)
     ap.add_argument("--max_seconds", type=float, default=0.0, help="debug: only the first N seconds per video")
+    ap.add_argument("--glasses_subjects", nargs="*", default=[],
+                    help="DMD subject ids wearing glasses (R2: 1 29 36) -> eye results split by eyewear")
     ap.add_argument("--threads", type=int, default=None)
     args = ap.parse_args(argv)
+    glasses = {str(g) for g in args.glasses_subjects}
 
     if pipeline_factory is None:
         if not args.eye_model:
@@ -280,6 +283,7 @@ def main(argv: Optional[list[str]] = None, pipeline_factory=None) -> int:
             lab = frame_eye_labels(cues["frame"].to_numpy(), ev)
             keep = np.isfinite(lab)
             eye_rows.append(pd.DataFrame({"subject_id": f"dmd/{subj}", "split": split, "session_id": sid,
+                                          "glasses": ("yes" if subj in glasses else "no") if glasses else "unknown",
                                           "label_closed": lab[keep].astype(int),
                                           "p_closed": cues["p_closed"].to_numpy()[keep]}))
             y = session_yawns(cues, ev, cfg, fps_video, args.calib_s, args.tolerance_s)
@@ -290,7 +294,7 @@ def main(argv: Optional[list[str]] = None, pipeline_factory=None) -> int:
             judged = len(eye)
             eye_ok = eye[np.isfinite(eye["p_closed"])]
             eye_ok.to_csv(out / "eye_frames.csv", index=False)
-            summ = summarize_predictions(eye_ok, ["split"])
+            summ = summarize_predictions(eye_ok, ["split", "glasses"])
             summ.to_csv(out / "eye_summary.csv", index=False)
             report += ["## Eye closure, frame level (labelled open vs closed frames)", "",
                        f"{judged} labelled frames at 15 FPS; {len(eye_ok)} had a face and both-eye prediction "

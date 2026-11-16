@@ -109,13 +109,15 @@ def test_eval_dmd_end_to_end_on_synthetic_session(tmp_path):
     out = tmp_path / "out"
     mod = _script()
     args = ["--videos_dir", str(vids), "--events", str(tmp_path / "events.csv"), "--stress_root", str(stress_root),
-            "--stress_manifest", str(tmp_path / "manifest.csv"), "--out_dir", str(out), "--calib_s", "30"]
+            "--stress_manifest", str(tmp_path / "manifest.csv"), "--out_dir", str(out), "--calib_s", "30",
+            "--glasses_subjects", "1"]
     assert mod.main(args, pipeline_factory=_factory) == 0
 
     report = (out / "report.md").read_text(encoding="utf-8")
     assert "Eye closure, frame level" in report and "Yawns, event level" in report and "Stress set" in report
     eye = pd.read_csv(out / "eye_summary.csv")
     assert eye.iloc[0]["recall_closed"] > 0.9 and eye.iloc[0]["accuracy"] > 0.9
+    assert "glasses=yes" in set(eye["group"])
     ys = pd.read_csv(out / "yawn_per_session.csv")
     assert ys.loc[0, "n_yawns"] == 2 and ys.loc[0, "n_hit"] == 2 and ys.loc[0, "false_alarms"] == 0
     st = pd.read_csv(out / "stress_summary.csv").set_index("stress_type")
