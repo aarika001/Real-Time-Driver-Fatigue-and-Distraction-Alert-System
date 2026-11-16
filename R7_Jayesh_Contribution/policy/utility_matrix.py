@@ -71,9 +71,9 @@ class UtilityMatrix:
         # Costs for ALERT driver (false alarms):
         # Taking no action has 0 cost.
         # Cost escalates with alert intensity + annoyance penalty
-        c_fa_soft = 0.3 * self.base_fa_cost + 0.5 * self.annoyance_penalty
-        c_fa_med = 1.0 * self.base_fa_cost + 1.0 * self.annoyance_penalty
-        c_fa_urgent = 2.5 * self.base_fa_cost + 2.0 * self.annoyance_penalty
+        c_fa_soft = 0.8 * self.base_fa_cost + 0.5 * self.annoyance_penalty
+        c_fa_med = 2.0 * self.base_fa_cost + 1.0 * self.annoyance_penalty
+        c_fa_urgent = 5.0 * self.base_fa_cost + 2.0 * self.annoyance_penalty
 
         # Costs for FATIGUE driver:
         # Missing completely incurs full miss cost.

@@ -130,11 +130,12 @@ class ExpectedUtilityAlertPolicy:
         best_action = AlertAction(best_action_idx)
 
         # Cooldown check: if an alert was triggered very recently (< min_alert_cooldown_s),
-        # prevent fluttering back and forth
+        # prevent fluttering back and forth, but ALWAYS allow immediate escalation if risk increases
         if best_action != AlertAction.NONE:
             if (timestamp_s - self._last_alert_ts) < self.min_alert_cooldown_s:
-                # Maintain previous alert level if already alerting
-                if self._last_action != AlertAction.NONE:
+                if best_action.value > self._last_action.value:
+                    self._last_action = best_action
+                else:
                     best_action = self._last_action
             else:
                 self._last_alert_ts = timestamp_s
