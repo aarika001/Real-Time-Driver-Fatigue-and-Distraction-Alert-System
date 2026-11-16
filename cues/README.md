@@ -128,8 +128,24 @@ python scripts/r4/webcam_demo.py --eye_model runs/eye_cnn/eye_cnn.onnx     # c =
 
 The webcam script prints per-stage latency and FPS and saves them to `results/r4/fps_report.json`.
 
+## DMD evaluation (R2 protocol)
+
+The team evaluates on UTA-RLDD and DMD (R2 decision log). `scripts/r4/eval_dmd.py` runs the full
+live pipeline on R2's DMD drowsiness face videos (RGB, never used for training) and reports:
+eye closure per frame (`eyes_state/close` vs `open`), yawn recall and false alarms per hour on the
+merged yawn intervals (with-hand yawns separately), and paired changes on R2's 456-image stress set.
+
+```bash
+python scripts/r4/eval_dmd.py --eye_model runs/eye_cnn/eye_cnn.onnx \
+    --videos_dir <NeuroNova_data>/dmd/dmd_video_v1 --events <NeuroNova_data>/dmd/r2_manifests/<events>.csv \
+    --stress_root <NeuroNova_data> --stress_manifest R2_Aadi_Contribution/metadata/stress_test_manifest_dmd.csv \
+    --out_dir results/r4/dmd_eval
+```
+
+Never commit DMD frames, events or stress images (CC BY-NC-ND, see R2 handoff); only the report.
+
 ## Run the tests
 
 ```bash
-python -m pytest tests/r4 -v
+python -m pytest tests/r4 -v      # or `python -m pytest` for every role's tests
 ```
