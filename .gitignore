@@ -3,3 +3,7 @@ processed_rldd/
 
 
 
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
