@@ -54,11 +54,11 @@ def main():
     estimator = CueReliabilityEstimator()
 
     scenarios = [
-        ("Nominal Good Lighting", QualitySignals(0.0, True, 110.0, 45.0, 0.00, 120.0, 0.2, 0.3, 0.98)),
-        ("Severe Eyewear Glare",  QualitySignals(1.0, True, 220.0, 15.0, 0.75, 90.0,  0.2, 0.5, 0.95)),
-        ("Off-Axis Head Turn",    QualitySignals(2.0, True, 100.0, 40.0, 0.00, 110.0, 3.8, 0.4, 0.85)),
-        ("Low Light / Dim Blur",  QualitySignals(3.0, True, 35.0,  12.0, 0.00, 25.0,  0.3, 1.2, 0.70)),
-        ("Face Occluded / Lost",  QualitySignals(4.0, False, float("nan"), float("nan"), float("nan"), float("nan"), float("nan"), float("nan"), 0.0)),
+        ("Nominal Lighting (R4 norm)", QualitySignals(0.0, True, 110.0 / 255.0, 45.0 / 255.0, 0.00, 120.0, 0.2, 0.3, 0.98)),
+        ("Severe Eyewear Glare",       QualitySignals(1.0, True, 220.0 / 255.0, 15.0 / 255.0, 0.75, 90.0,  0.2, 0.5, 0.95)),
+        ("Off-Axis Head Turn",         QualitySignals(2.0, True, 100.0 / 255.0, 40.0 / 255.0, 0.00, 110.0, 3.8, 0.4, 0.85)),
+        ("Low Light / Dim Blur",       QualitySignals(3.0, True, 35.0 / 255.0,  12.0 / 255.0, 0.00, 25.0,  0.3, 1.2, 0.70)),
+        ("Face Occluded / Lost",       QualitySignals(4.0, False, float("nan"), float("nan"), float("nan"), float("nan"), float("nan"), float("nan"), 0.0)),
     ]
 
     print(f"  {'Scenario':<24} | {'r_eye':<7} | {'r_mouth':<7} | {'r_head':<7} | {'Overall':<7}")

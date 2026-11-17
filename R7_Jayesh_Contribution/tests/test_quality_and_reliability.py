@@ -78,6 +78,35 @@ def test_cue_reliability_estimator_defaults():
     assert r_bad["overall"] < r_good["overall"]
 
 
+def test_quality_feature_extractor_r4_scaling():
+    """Verify that inputs normalized to [0, 1] by R4 (divided by 255) are correctly scaled."""
+    ext = QualityFeatureExtractor()
+    estimator = CueReliabilityEstimator(feature_extractor=ext)
+
+    # R4 contract: brightness in [0, 1], contrast in [0, 0.5]
+    r4_signals = QualitySignals(
+        timestamp_s=1.0,
+        face_detected=True,
+        eye_brightness=110.0 / 255.0,  # ~0.431 from R4
+        eye_contrast=45.0 / 255.0,     # ~0.176 from R4
+        eye_glare_frac=0.0,
+        eye_sharpness=120.0,
+        head_angle_z=0.2,
+        landmark_jitter=0.5,
+        detector_confidence=0.99,
+    )
+
+    vec = ext.extract_eye_quality_vector(r4_signals)
+    # Feature 0: brightness deviation should be ~0.0
+    assert vec[0] == pytest.approx(0.0, abs=1e-3)
+    # Feature 1: contrast normalized by 50 should be 45/50 = 0.90
+    assert vec[1] == pytest.approx(0.90, abs=1e-3)
+
+    # Predicted eye reliability should be high (> 0.70) under nominal R4 conditions
+    res = estimator.predict_all(r4_signals)
+    assert res["eye"] > 0.70
+
+
 def test_cue_reliability_estimator_fit():
     estimator = CueReliabilityEstimator()
     rng = np.random.RandomState(123)

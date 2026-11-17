@@ -20,11 +20,12 @@ class QualitySignals:
     """Per-frame raw quality metrics collected from perception modules."""
     timestamp_s: float
     face_detected: bool
-    # Eye signals from R4 (cues/eye_crop.py)
+    # Eye signals from R4 (cues/eye_crop.py) and R3 (preprocess-rldd.py)
+    # Brightness in [0, 1] (mean / 255.0), contrast in [0, 0.5] (std / 255.0)
     eye_brightness: float = float("nan")
     eye_contrast: float = float("nan")
-    eye_glare_frac: float = float("nan")
-    eye_sharpness: float = float("nan")
+    eye_glare_frac: float = float("nan")  # in [0, 1]
+    eye_sharpness: float = float("nan")   # Laplacian variance
     # Head pose signal from R5 (head-pose/head_pose_core.py)
     head_angle_z: float = float("nan")  # from head_angle_from_neutral(delta_pitch, delta_yaw)
     # Landmark stability
@@ -101,8 +102,15 @@ class QualityFeatureExtractor:
             return np.array([1.0, 0.0, 1.0, 0.0, 5.0, 10.0, 0.0], dtype=np.float32)
 
         # Normalizations
-        b_dev = abs(signals.eye_brightness - 110.0) / 110.0
-        c_norm = np.clip(signals.eye_contrast / 50.0, 0.0, 3.0)
+        # Note: R4 (cues/eye_crop.py) and R3 (preprocess-rldd.py) provide brightness
+        # and contrast divided by 255.0 (range [0, 1]). We scale by 255.0 to map to nominal
+        # pixel intensity range [0, 255]. Supporting <= 1.0 ensures seamless compatibility
+        # whether receiving normalized [0, 1] inputs or direct [0, 255] values.
+        b_val = signals.eye_brightness * 255.0 if signals.eye_brightness <= 1.0 else signals.eye_brightness
+        c_val = signals.eye_contrast * 255.0 if signals.eye_contrast <= 1.0 else signals.eye_contrast
+
+        b_dev = abs(b_val - 110.0) / 110.0
+        c_norm = np.clip(c_val / 50.0, 0.0, 3.0)
         g_frac = np.clip(signals.eye_glare_frac, 0.0, 1.0)
         s_norm = np.clip(signals.eye_sharpness / 100.0, 0.0, 5.0)
 
