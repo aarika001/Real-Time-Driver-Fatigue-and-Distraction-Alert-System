@@ -98,19 +98,29 @@ def test_p_closed_averages_only_valid_eyes():
 def _load_r3_module():
     pytest.importorskip("mediapipe")
     pytest.importorskip("pandas")
-    if "tqdm" not in sys.modules and importlib.util.find_spec("tqdm") is None:
-        sys.modules["tqdm"] = types.SimpleNamespace(tqdm=lambda it, **kw: it)  # R3 only uses it for progress bars
     if not R3_SCRIPT.exists():
         pytest.skip("R3 preprocessing script not present")
-    spec = importlib.util.spec_from_file_location("r3_preprocess", R3_SCRIPT)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    # R3's script imports tqdm only for progress bars. If tqdm is not installed, put a stub in
+    # sys.modules just while the script loads, then remove it: a leftover stub has no __spec__
+    # and breaks later imports that call importlib.util.find_spec("tqdm") (e.g. PyTorch).
+    stub_added = "tqdm" not in sys.modules and importlib.util.find_spec("tqdm") is None
+    if stub_added:
+        sys.modules["tqdm"] = types.SimpleNamespace(tqdm=lambda it, **kw: it)
+    try:
+        spec = importlib.util.spec_from_file_location("r3_preprocess", R3_SCRIPT)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+    finally:
+        if stub_added:
+            sys.modules.pop("tqdm", None)
     return mod
 
 
 def test_parity_with_r3_rldd_preprocessing():
     """Our crops/quality/indices must equal what R3 stored in processed_rldd."""
     r3 = _load_r3_module()
+    tq = sys.modules.get("tqdm")
+    assert tq is None or getattr(tq, "__spec__", None) is not None   # no stub left behind
     assert tuple(r3.LEFT_EYE_IDXS) == L.EYE_IMG_LEFT
     assert tuple(r3.RIGHT_EYE_IDXS) == L.EYE_IMG_RIGHT
     assert tuple(r3.MOUTH_IDXS) == L.MOUTH_OUTER

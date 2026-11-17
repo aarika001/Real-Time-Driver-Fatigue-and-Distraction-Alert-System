@@ -3,6 +3,7 @@ numpy
 opencv-python
 mediapipe
 pandas
+tqdm
 pyyaml
 scikit-learn
 matplotlib
