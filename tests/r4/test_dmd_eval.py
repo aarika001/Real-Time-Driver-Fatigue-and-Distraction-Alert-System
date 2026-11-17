@@ -127,3 +127,18 @@ def test_eval_dmd_end_to_end_on_synthetic_session(tmp_path):
     # second run uses the per-session cache and gives the same numbers
     assert mod.main(args, pipeline_factory=_factory) == 0
     assert pd.read_csv(out / "yawn_per_session.csv").loc[0, "n_hit"] == 2
+
+
+def test_yawn_events_file_replaces_raw_yawn_phases(tmp_path):
+    vids = tmp_path / "v"
+    vids.mkdir()
+    ev = _make_session(vids, "gA_1_s5_test", seconds=60)
+    raw = pd.concat([ev, ev[ev["native_label"].str.startswith("yawning/")]], ignore_index=True)  # duplicated phases
+    raw.to_csv(tmp_path / "all.csv", index=False)
+    merged = ev[ev["native_label"].str.startswith("yawning/")].copy()
+    merged.to_csv(tmp_path / "yawns.csv", index=False)
+    out = tmp_path / "o"
+    assert _script().main(["--videos_dir", str(vids), "--events", str(tmp_path / "all.csv"),
+                           "--yawn_events", str(tmp_path / "yawns.csv"), "--out_dir", str(out)],
+                          pipeline_factory=_factory) == 0
+    assert pd.read_csv(out / "yawn_per_session.csv").loc[0, "n_yawns"] == 2      # not 4
