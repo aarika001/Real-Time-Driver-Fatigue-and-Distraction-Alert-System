@@ -1,5 +1,7 @@
 processed_rldd/
 .venv/
 
-
+driver_monitor/venv/
+__pycache__/
+*.pyc
 
