@@ -259,6 +259,8 @@ def main():
     x_scaled = scaler.transform(
         x.reshape(-1, x.shape[-1])
     ).reshape(x.shape).astype(np.float32)
+    joblib.dump(scaler, out / "activity_scaler.joblib")
+    print("Preprocessing scaler saved.")
 
     train_ds = WindowDataset(x_scaled[train_idx], y[train_idx])
     val_ds = WindowDataset(x_scaled[val_idx], y[val_idx])
@@ -293,6 +295,30 @@ def main():
     best_val_loss = float("inf")
     best_state = None
     history = []
+
+    def save_checkpoint(path, epoch, val_loss):
+        checkpoint = {
+            "epoch": epoch,
+            "model_state_dict": {
+                k: v.detach().cpu().clone()
+                for k, v in model.state_dict().items()
+            },
+            "optimizer_state_dict": optimizer.state_dict(),
+            "input_size": int(x.shape[-1]),
+            "hidden_size": 64,
+            "num_classes": len(LABELS),
+            "labels": LABELS,
+            "feature_names": feature_names,
+            "window_frames": 75,
+            "stride_frames": 15,
+            "validation_loss": float(val_loss),
+            "best_validation_loss": float(best_val_loss),
+            "experiment": "Mirror activity recognition",
+            "not_official_r6_vigilance_checkpoint": True,
+        }
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        torch.save(checkpoint, temporary)
+        temporary.replace(path)
 
     for epoch in range(1, args.epochs + 1):
         model.train()
@@ -338,6 +364,16 @@ def main():
                 k: v.detach().cpu().clone()
                 for k, v in model.state_dict().items()
             }
+            save_checkpoint(
+                out / "activity_gru_best.pt", epoch, val_loss
+            )
+
+        save_checkpoint(
+            out / "activity_gru_last.pt", epoch, val_loss
+        )
+        pd.DataFrame(history).to_csv(
+            out / "training_history.csv", index=False
+        )
 
     if best_state is None:
         raise RuntimeError("Training did not produce a valid checkpoint.")
@@ -382,7 +418,7 @@ def main():
         "experiment": "YawDD Mirror activity recognition",
         "not_official_r6_vigilance_checkpoint": True,
     }
-    torch.save(checkpoint, out / "activity_gru_best.pt")
+    # Best checkpoint was already saved during training; do not overwrite it.
     joblib.dump(scaler, out / "activity_scaler.joblib")
 
     with open(out / "training_history.json", "w", encoding="utf-8") as f:

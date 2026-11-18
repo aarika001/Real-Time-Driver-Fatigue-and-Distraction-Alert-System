@@ -414,6 +414,31 @@ def main():
     best_state = None
     history = []
 
+    # Save preprocessing before training, so it survives interruptions.
+    joblib.dump(scaler, out / "r6_preprocessing.joblib")
+
+    def save_training_checkpoint(path, epoch, validation_loss):
+        checkpoint = {
+            "epoch": epoch,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": opt.state_dict(),
+            "input_size": int(x.shape[-1]),
+            "hidden_size": 64,
+            "num_classes": len(LABELS),
+            "labels": LABELS,
+            "window": a.window,
+            "stride": a.stride,
+            "fps": a.fps,
+            "feature_names": feature_names,
+            "validation_loss": float(validation_loss),
+            "best_validation_loss": float(best_val),
+            "history": history,
+            "seed": a.seed,
+        }
+        temporary_path = path.with_suffix(path.suffix + ".tmp")
+        torch.save(checkpoint, temporary_path)
+        temporary_path.replace(path)
+
     for epoch in range(1, a.epochs + 1):
         model.train()
         train_losses = []
@@ -482,6 +507,20 @@ def main():
                 k: t.detach().cpu().clone()
                 for k, t in model.state_dict().items()
             }
+
+            # Preserve the best model immediately.
+            save_training_checkpoint(
+                out / "r6_gru_best.pt",
+                epoch,
+                v,
+            )
+
+        # Preserve the latest completed epoch, even if it is not the best.
+        save_training_checkpoint(
+            out / "r6_gru_last.pt",
+            epoch,
+            v,
+        )
 
     if best_state is None:
         raise RuntimeError(
