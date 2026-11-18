@@ -23,3 +23,6 @@ results/r4/dmd_eval/*
 !results/r4/dmd_eval/report.md
 results/r4/yawdd/*
 !results/r4/yawdd/summary.md
+results/r4/rldd_test/
+results/r4/rldd_eval/*
+!results/r4/rldd_eval/report.md

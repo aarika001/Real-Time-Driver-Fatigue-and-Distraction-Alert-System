@@ -229,3 +229,12 @@ def test_onnx_export_matches_pytorch(tmp_path):
     a = EyeStatePredictor(tmp_path / "m.pt").predict_crops(crops)
     b = load_eye_predictor(tmp_path / "m.onnx").predict_crops(crops)
     np.testing.assert_allclose(a, b, atol=1e-4)
+
+
+def test_rldd_videos_ignores_duplicate_copies(tmp_path):
+    rldd = _fake_rldd(tmp_path / "part1", n_subjects=2, frames=20)
+    copy = tmp_path / "part2" / "Fold1" / "subject_01"
+    copy.mkdir(parents=True)
+    (copy / "kss_0_alert.npz").write_bytes((rldd / "Fold1" / "subject_01" / "kss_0_alert.npz").read_bytes())
+    vids = _script("eval_eye_cnn").rldd_videos(tmp_path)
+    assert len(vids) == 4 and not vids.duplicated(["subject_id", "label"]).any()
