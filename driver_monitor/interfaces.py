@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from typing import Optional, Tuple
 import numpy as np
 
-# Column order of TemporalModel.window_array() -> feed this to the GRU (R6).
 FEATURE_NAMES = ("p_eye_closed", "ear_rel", "mar_rel", "yaw_rel", "pitch_rel",
                  "r_eye", "r_mouth", "r_head")
 
@@ -16,23 +15,26 @@ class Percept:
     p_eye_closed: float = 0.0
     ear: float = 0.0
     mar: float = 0.0
-    yaw: float = 0.0            # degrees, raw (not calibrated)
+    yaw: float = 0.0            # degrees, raw solvePnP
     pitch: float = 0.0
-    # quality signals, all scaled to [0, 1]: brightness, contrast, glare_frac,
-    # sharpness, jitter, det_conf
     quality: dict = field(default_factory=dict)
-    landmarks_px: Optional[np.ndarray] = None   # (N, 2) for drawing
-    eye_crops: Optional[Tuple] = None           # (left, right) 64x64 grayscale
+    landmarks_px: Optional[np.ndarray] = None
+    eye_crops: Optional[Tuple] = None
+    roll: float = 0.0
+    # Raw R3/R4 eye quality [brightness, contrast(std/255), glare_frac, laplacian_var]
+    raw_quality: Optional[Tuple[float, float, float, float]] = None
 
 
 @dataclass
 class Features:
     """Per-driver-calibrated cues (calibration module output)."""
     p_eye_closed: float = 0.0
-    ear_rel: float = 1.0        # ear / personal baseline
-    mar_rel: float = 0.0        # mar - personal baseline
-    yaw_rel: float = 0.0        # yaw - neutral yaw
+    ear_rel: float = 1.0
+    mar_rel: float = 0.0
+    yaw_rel: float = 0.0
     pitch_rel: float = 0.0
+    face_found: bool = True
+    gru_row: Optional[np.ndarray] = None        # (13,) float32 from temporal_model/features.py
 
 
 @dataclass
@@ -58,7 +60,7 @@ class Decision:
     """Output of the utility policy (R7 owns it)."""
     action_idx: int = 0
     action: str = "none"
-    dominant: str = "-"         # 'fatigue' or 'distraction'
+    dominant: str = "-"
     degraded: bool = False
     eu: dict = field(default_factory=dict)
     n_recent_alerts: int = 0

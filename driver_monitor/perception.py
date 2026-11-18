@@ -1,8 +1,4 @@
-"""MediaPipe Face Landmarker -> Percept (EAR, MAR, head pose, quality signals).
-
-This is the real B1 front-end. R4 (eye CNN) and R5 (head pose) refine pieces of it.
-"""
-import math
+"""MediaPipe Face Landmarker -> Percept (R3/R4/R5-aligned cues and quality signals)."""
 import os
 import urllib.request
 import cv2
@@ -13,19 +9,38 @@ from mediapipe.tasks.python import vision
 
 import config
 import eye_model
+from cues.eye_crop import crop_eye
 from interfaces import Percept
 
 MODEL_URL = ("https://storage.googleapis.com/mediapipe-models/face_landmarker/"
              "face_landmarker/float16/1/face_landmarker.task")
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "face_landmarker.task")
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT_MODEL = os.path.abspath(os.path.join(HERE, "..", "face_landmarker.task"))
+LOCAL_MODEL = os.path.join(HERE, "models", "face_landmarker.task")
+
+# Exact R3 / R4 / R5 landmark indices and 3D head model
+MOUTH_IDXS = [61, 291, 39, 181, 0, 17, 269, 405]
+LEFT_EYE_IDXS = [33, 133, 160, 159, 158, 144, 145, 153]
+RIGHT_EYE_IDXS = [362, 263, 387, 386, 385, 373, 374, 380]
+POSE_2D_IDXS = [1, 152, 33, 263, 61, 291]
+FACE_3D_MODEL = np.array([
+    (0.0, 0.0, 0.0),             # Nose tip (1)
+    (0.0, -330.0, -65.0),        # Chin (152)
+    (-225.0, 170.0, -135.0),     # Left eye corner (33)
+    (225.0, 170.0, -135.0),      # Right eye corner (263)
+    (-150.0, -150.0, -125.0),    # Left mouth corner (61)
+    (150.0, -150.0, -125.0),     # Right mouth corner (291)
+], dtype=np.float64)
 
 
 def ensure_model() -> str:
-    if not os.path.exists(MODEL_PATH):
-        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    if os.path.isfile(ROOT_MODEL):
+        return ROOT_MODEL
+    if not os.path.exists(LOCAL_MODEL):
+        os.makedirs(os.path.dirname(LOCAL_MODEL), exist_ok=True)
         print("Downloading face_landmarker.task (~4 MB) ...")
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-    return MODEL_PATH
+        urllib.request.urlretrieve(MODEL_URL, LOCAL_MODEL)
+    return LOCAL_MODEL
 
 
 def _d(a, b):
@@ -37,36 +52,26 @@ def _ear(pts, idx):
     return (_d(p2, p6) + _d(p3, p5)) / (2.0 * _d(p1, p4) + 1e-6)
 
 
-def _mar(pts):
-    v = sum(_d(pts[a], pts[b]) for a, b in config.LM_MOUTH_V) / len(config.LM_MOUTH_V)
-    return v / (_d(pts[config.LM_MOUTH_H[0]], pts[config.LM_MOUTH_H[1]]) + 1e-6)
+def _mar_r3(pts):
+    """Exact outer-lip MAR from RLDD_preprocess/preprocess-rldd.py."""
+    v1 = _d(pts[MOUTH_IDXS[2]], pts[MOUTH_IDXS[3]])
+    v2 = _d(pts[MOUTH_IDXS[4]], pts[MOUTH_IDXS[5]])
+    v3 = _d(pts[MOUTH_IDXS[6]], pts[MOUTH_IDXS[7]])
+    horiz = _d(pts[MOUTH_IDXS[0]], pts[MOUTH_IDXS[1]])
+    return float((v1 + v2 + v3) / (3.0 * horiz + 1e-6))
 
 
-def _wrap(a):
-    # Canonical-face transforms can put pitch near +/-180; fold it back near 0.
-    if abs(a) > 90:
-        a -= math.copysign(180.0, a)
-    return a
-
-
-def head_angles(matrix):
-    """(yaw, pitch) in degrees from MediaPipe's 4x4 facial transformation matrix.
-    VERIFY the signs on your webcam and flip YAW_SIGN / PITCH_SIGN in config.py if needed."""
-    R = np.array(matrix, dtype=np.float64)[:3, :3]
-    R = R / (np.linalg.norm(R, axis=0, keepdims=True) + 1e-9)
-    pitch = math.degrees(math.atan2(R[2, 1], R[2, 2]))
-    yaw = math.degrees(math.atan2(-R[2, 0], math.hypot(R[2, 1], R[2, 2])))
-    return config.YAW_SIGN * _wrap(yaw), config.PITCH_SIGN * _wrap(pitch)
-
-
-def _box(pts_sub, shape, margin):
-    h, w = shape
-    x0, y0 = pts_sub.min(axis=0)
-    x1, y1 = pts_sub.max(axis=0)
-    mx, my = (x1 - x0) * margin, (y1 - y0) * margin
-    xa, xb = int(max(x0 - mx, 0)), int(min(x1 + mx, w))
-    ya, yb = int(max(y0 - my, 0)), int(min(y1 + my, h))
-    return xa, ya, xb, yb
+def _head_pose_pnp(pts, w: int, h: int):
+    """Exact solvePnP (pitch, yaw, roll) matching R3 preprocess-rldd.py and R5 head_pose_core.py."""
+    pts_2d = np.array([pts[i] for i in POSE_2D_IDXS], dtype=np.float64)
+    focal = float(w)
+    cam = np.array([[focal, 0.0, w / 2.0], [0.0, focal, h / 2.0], [0.0, 0.0, 1.0]], dtype=np.float64)
+    ok, rot_vec, _ = cv2.solvePnP(FACE_3D_MODEL, pts_2d, cam, np.zeros((4, 1)), flags=cv2.SOLVEPNP_ITERATIVE)
+    if not ok:
+        return 0.0, 0.0, 0.0
+    rmat, _ = cv2.Rodrigues(rot_vec)
+    angles, _, _, _, _, _ = cv2.RQDecomp3x3(rmat)
+    return float(angles[0]), float(angles[1]), float(angles[2])
 
 
 class Perception:
@@ -75,72 +80,70 @@ class Perception:
             base_options=mp_python.BaseOptions(model_asset_path=ensure_model()),
             running_mode=vision.RunningMode.VIDEO,
             num_faces=1,
-            output_facial_transformation_matrixes=True,
+            output_facial_transformation_matrixes=False,
         )
         self.lm = vision.FaceLandmarker.create_from_options(opts)
         self._last_ts = -1
         self._prev_eye = None
 
-    # ------------------------------------------------------------------
     def process(self, frame_bgr, t: float) -> Percept:
         h, w = frame_bgr.shape[:2]
         gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
         rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-        ts = max(int(t * 1000), self._last_ts + 1)      # MediaPipe needs strictly increasing ms
+        ts = max(int(t * 1000), self._last_ts + 1)
         self._last_ts = ts
         res = self.lm.detect_for_video(mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb), ts)
 
         if not res.face_landmarks:
             self._prev_eye = None
-            return Percept(t=t, face_found=False, quality=self._quality(gray, None))
+            return Percept(
+                t=t, face_found=False,
+                quality=self._quality_no_face(gray),
+                raw_quality=(0.0, 0.0, 1.0, 0.0),
+            )
 
         pts = np.array([[l.x * w, l.y * h] for l in res.face_landmarks[0]], dtype=np.float32)
         ear = 0.5 * (_ear(pts, config.LM_R_EYE) + _ear(pts, config.LM_L_EYE))
-        mar = _mar(pts)
-        yaw = pitch = 0.0
-        if res.facial_transformation_matrixes:
-            yaw, pitch = head_angles(res.facial_transformation_matrixes[0])
-        crops = (self._crop(gray, pts, config.LM_L_EYE), self._crop(gray, pts, config.LM_R_EYE))
+        mar = _mar_r3(pts)
+        pitch, yaw, roll = _head_pose_pnp(pts, w, h)
+
+        cl, ql, vl = crop_eye(gray, pts[LEFT_EYE_IDXS])
+        cr, qr, vr = crop_eye(gray, pts[RIGHT_EYE_IDXS])
+        raw_q = tuple((a + b) / 2.0 for a, b in zip(ql.as_list(), qr.as_list()))
+        crops = (cl if vl else None, cr if vr else None)
+
         return Percept(
             t=t, face_found=True,
             p_eye_closed=eye_model.predict_eye_closed(crops, ear),
-            ear=ear, mar=mar, yaw=yaw, pitch=pitch,
-            quality=self._quality(gray, pts), landmarks_px=pts, eye_crops=crops,
+            ear=ear, mar=mar, yaw=yaw, pitch=pitch, roll=roll,
+            quality=self._quality_from_eye(raw_q, pts),
+            landmarks_px=pts, eye_crops=crops, raw_quality=raw_q,
         )
 
-    # ------------------------------------------------------------------
-    @staticmethod
-    def _crop(gray, pts, idx, size=64):
-        xa, ya, xb, yb = _box(pts[idx], gray.shape, 0.6)
-        if xb - xa < 4 or yb - ya < 4:
-            return None
-        return cv2.resize(gray[ya:yb, xa:xb], (size, size))
-
-    def _quality(self, gray, pts):
-        """All outputs in [0, 1]. These feed the reliability estimator (R7)."""
-        if pts is None:
-            region, face, jitter = gray, gray, 1.0
-        else:
-            eye_idx = config.LM_R_EYE + config.LM_L_EYE
-            xa, ya, xb, yb = _box(pts[eye_idx], gray.shape, 0.5)
-            region = gray[ya:yb, xa:xb]
-            fx0, fy0, fx1, fy1 = _box(pts, gray.shape, 0.0)
-            face = gray[fy0:fy1, fx0:fx1]
-            if region.size == 0 or face.size == 0:
-                region, face = gray, gray
-            # landmark jitter: motion of the eye points after removing global translation
-            e = pts[eye_idx]
-            rel = e - e.mean(axis=0)
-            iod = _d(pts[33], pts[263]) + 1e-6
-            jitter = 0.0 if self._prev_eye is None else float(
-                np.abs(rel - self._prev_eye).mean() / iod / 0.03)
-            self._prev_eye = rel
-        face_small = cv2.resize(face, (128, 128))
+    def _quality_no_face(self, gray):
+        small = cv2.resize(gray, (128, 128))
         return {
-            "brightness": float(region.mean() / 255.0),
-            "contrast": float(min(region.std() / 80.0, 1.0)),
-            "glare_frac": float((region >= 245).mean()),
-            "sharpness": float(min(cv2.Laplacian(face_small, cv2.CV_32F).var() / 500.0, 1.0)),
+            "brightness": float(gray.mean() / 255.0),
+            "contrast": float(min(gray.std() / 80.0, 1.0)),
+            "glare_frac": float((gray >= 245).mean()),
+            "sharpness": float(min(cv2.Laplacian(small, cv2.CV_32F).var() / 500.0, 1.0)),
+            "jitter": 1.0,
+            "det_conf": 0.0,
+        }
+
+    def _quality_from_eye(self, raw_q, pts):
+        eye_idx = config.LM_R_EYE + config.LM_L_EYE
+        e = pts[eye_idx]
+        rel = e - e.mean(axis=0)
+        iod = _d(pts[33], pts[263]) + 1e-6
+        jitter = 0.0 if self._prev_eye is None else float(
+            np.abs(rel - self._prev_eye).mean() / iod / 0.03)
+        self._prev_eye = rel
+        return {
+            "brightness": float(raw_q[0]),
+            "contrast": float(min((raw_q[1] * 255.0) / 80.0, 1.0)),
+            "glare_frac": float(raw_q[2]),
+            "sharpness": float(min(raw_q[3] / 500.0, 1.0)),
             "jitter": float(min(jitter, 1.0)),
-            "det_conf": 1.0 if pts is not None else 0.0,
+            "det_conf": 1.0,
         }
