@@ -2,6 +2,7 @@
 from R7_Jayesh_Contribution.reliability.estimator import CueReliabilityEstimator
 from R7_Jayesh_Contribution.reliability.quality_features import QualitySignals
 from interfaces import Percept, Reliability
+import math
 
 estimator = CueReliabilityEstimator()
 
@@ -23,6 +24,8 @@ def estimate(p: Percept) -> Reliability:
         return Reliability(0.0, 0.0, 0.0)
 
     q = p.quality
+    pitch_folded = p.pitch - math.copysign(180.0, p.pitch) if abs(p.pitch) > 90.0 else p.pitch
+
     signals = QualitySignals(
         timestamp_s=p.t,
         face_detected=True,
@@ -30,7 +33,7 @@ def estimate(p: Percept) -> Reliability:
         eye_contrast=q.get("contrast", 0.5) * 80.0,
         eye_glare_frac=q.get("glare_frac", 0.0),
         eye_sharpness=q.get("sharpness", 0.5) * 500.0,
-        head_angle_z=max(abs(p.yaw), abs(p.pitch)) / 15.0,
+        head_angle_z=max(abs(p.yaw), abs(pitch_folded)) / 15.0,
         landmark_jitter=q.get("jitter", 0.0),
         detector_confidence=q.get("det_conf", 1.0),
     )
