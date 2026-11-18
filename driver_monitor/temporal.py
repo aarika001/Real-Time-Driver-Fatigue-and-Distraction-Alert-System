@@ -7,6 +7,8 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+torch.set_num_threads(1)
+
 _TM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "temporal_model"))
 if _TM_DIR not in sys.path:
     sys.path.insert(0, _TM_DIR)
@@ -45,6 +47,8 @@ class TemporalModel:
     def __init__(self):
         self.buf = deque()      # (t, gru_row_13, yaw_rel, pitch_rel, r_head)
         self.ensemble = _load_ensemble()
+        self._last_gru_t = -1.0
+        self._last_pf = 0.0
 
     def update(self, f, r, t) -> TemporalOut:
         if f.gru_row is not None:
@@ -73,15 +77,16 @@ class TemporalModel:
         if ts[-1] - ts[0] < config.STUB_WARMUP_S:
             return TemporalOut(np.array([1.0, 0.0, 0.0], dtype=np.float32), {"warmup": True})
 
-        # 1. Fatigue probability from R6's 4-fold temperature-scaled GRU ensemble
-        win = self.window_array()
-        if self.ensemble:
+        # 1. Fatigue probability from R6's 4-fold GRU ensemble (4 Hz refresh + EMA)
+        if self.ensemble and (t - self._last_gru_t >= 0.25):
+            win = self.window_array()
             x = torch.from_numpy(win[None])                     # (1, 75, 13)
             with torch.inference_mode():
                 probs_2 = sum(F.softmax(m(x) / temp, dim=-1)[0] for m, temp in self.ensemble) / len(self.ensemble)
-            pf = float(probs_2[1].item())
-        else:
-            pf = 0.0
+            raw_pf = float(probs_2[1].item())
+            self._last_pf = 0.25 * raw_pf + 0.75 * self._last_pf if self._last_gru_t >= 0 else raw_pf
+            self._last_gru_t = t
+        pf = self._last_pf
 
         # 2. Distraction probability from sustained head deviation (brief mirror checks stay < 0.3)
         yaws = np.array([b[2] for b in self.buf], dtype=np.float64)

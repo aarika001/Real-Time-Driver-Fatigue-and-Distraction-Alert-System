@@ -11,7 +11,7 @@ def _get_predictor():
     if predictor is None:
         model_path = os.path.join(os.path.dirname(__file__), "models", "eye_cnn.onnx")
         if os.path.exists(model_path):
-            predictor = load_eye_predictor(model_path)
+            predictor = load_eye_predictor(model_path, num_threads=2)
         else: print(f"[WARNING] Missing {model_path} — falling back to EAR")
     return predictor
 

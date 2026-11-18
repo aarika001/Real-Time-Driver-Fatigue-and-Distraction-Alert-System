@@ -5,12 +5,15 @@ import config
 from interfaces import Decision, TemporalOut, Reliability
 
 class AlertPolicy:
-    def __init__(self, miss_ratio: float = config.MISS_RATIO):
+    def __init__(self, miss_ratio: float = 3.0):
         self.miss_ratio = miss_ratio
-        self.r7_policy = ExpectedUtilityAlertPolicy(cost_ratio=miss_ratio)
+        self.r7_policy = ExpectedUtilityAlertPolicy(
+            cost_ratio=miss_ratio,
+            min_alert_cooldown_s=4.0,
+        )
         self.r7_degraded = MonitoringDegradedTracker(
-            threshold=config.R_MIN, 
-            required_duration_s=config.DEGRADED_SECONDS
+            threshold=config.R_MIN,
+            required_duration_s=config.DEGRADED_SECONDS,
         )
 
     def set_ratio(self, r: float):

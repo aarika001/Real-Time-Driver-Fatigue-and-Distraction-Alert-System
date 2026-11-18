@@ -6,6 +6,10 @@
 import argparse
 import cv2
 import numpy as np
+import os
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
 
 import config
 import degrade
@@ -27,7 +31,7 @@ def parse():
     ap.add_argument("--width", type=int, default=640)
     ap.add_argument("--height", type=int, default=480)
     ap.add_argument("--max-width", type=int, default=960)
-    ap.add_argument("--display-width", type=int, default=1280,
+    ap.add_argument("--display-width", type=int, default=960,
                     help="HUD is drawn at this width so text stays crisp (0 = native frame size)")
     ap.add_argument("--calib-seconds", type=float, default=config.CALIB_SECONDS)
     ap.add_argument("--no-mirror", action="store_true")
@@ -96,7 +100,7 @@ def main():
             if args.display_width and frame.shape[1] != args.display_width:
                 k = args.display_width / frame.shape[1]
                 frame = cv2.resize(frame, (args.display_width, int(frame.shape[0] * k)),
-                                   interpolation=cv2.INTER_CUBIC)
+                   interpolation=cv2.INTER_LINEAR)
                 hud.lm_scale = k
             draw_hud(frame, hud)
 
