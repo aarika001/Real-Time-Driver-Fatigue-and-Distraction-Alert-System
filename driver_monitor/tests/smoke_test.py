@@ -38,12 +38,12 @@ def mirror(t):    # brief 1 s head turns
 def looking_away(t): return Percept(t, True, 0, 0.30, 0.02, 40.0 if t > 8 else 0.0, 0, dict(Q))
 def dark(t):      return Percept(t, True, 0, 0.30, 0.02, 0, 0, dict(Q, brightness=0.03)) if t > 8 else normal(t)
 
-a, _, tm = run(normal);        assert max(a) == 0, "false alarm on normal driving"
-a, _, _ = run(drowsy);         assert max(a) >= 1, "missed sustained eye closure"
-a, _, _ = run(mirror);         assert max(a) == 0, "mirror check triggered an alert"
-a, _, _ = run(looking_away);   assert max(a) >= 1, "missed sustained look-away"
+a, _, tm = run(normal);        assert max(a) <= 1, "audio/urgent false alarm on normal driving"
+a, _, _ = run(drowsy);         assert max(a) >= 2, "missed sustained eye closure"
+a, _, _ = run(mirror);         assert max(a) <= 1, "mirror check triggered an audio/urgent alert"
+a, _, _ = run(looking_away);   assert max(a) >= 2, "missed sustained look-away"
 a, dg, _ = run(dark);          assert any(dg), "no degraded banner in the dark"
-assert tm.window_array().shape == (config.WINDOW_FRAMES, 8)
+assert tm.window_array().shape == (config.WINDOW_FRAMES, 13)
 
 # policy: ratio changes behaviour (higher miss cost -> alerts earlier)
 from interfaces import TemporalOut, Reliability
