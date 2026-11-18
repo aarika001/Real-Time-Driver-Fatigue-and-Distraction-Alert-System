@@ -1,0 +1,48 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Raw video and image data
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.mpeg
+*.jpg
+*.jpeg
+*.png
+
+# Generated data and model artifacts
+*.npz
+*.npy
+*.pt
+*.pth
+*.joblib
+*.pkl
+*.pickle
+
+# Local data and outputs
+data/raw/*
+!data/raw/**/
+!data/raw/**/.gitkeep
+
+data/processed/*
+!data/processed/**/
+!data/processed/**/.gitkeep
+
+outputs/*
+!outputs/README.md
+
+# Temporary and backup files
+*.tmp
+*.log
+*.before_label_fix
+.DS_Store
+Thumbs.db
