@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 torch.set_num_threads(1)
 
-_TM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "temporal_model"))
+_TM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "temporal-model"))
 if _TM_DIR not in sys.path:
     sys.path.insert(0, _TM_DIR)
 

@@ -1,9 +1,9 @@
-"""Per-driver calibration (wraps R6's temporal_model/features.py)."""
+"""Per-driver calibration (wraps R6's temporal-model/features.py)."""
 import os
 import sys
 import numpy as np
 
-_TM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "temporal_model"))
+_TM_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "temporal-model"))
 if _TM_DIR not in sys.path:
     sys.path.insert(0, _TM_DIR)
 
