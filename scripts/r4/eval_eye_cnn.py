@@ -109,7 +109,10 @@ def rldd_videos(rldd_dir: str | Path) -> pd.DataFrame:
         subject = p.parent.name.replace("subject_", "")
         rows.append({"path": str(p), "fold": fold, "subject_id": f"rldd/{subject}",
                      "raw_kss": m.group(1), "label": m.group(2)})
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    if len(df):   # the same video can arrive twice when the Drive download is split into overlapping parts
+        df = df.drop_duplicates(subset=["fold", "subject_id", "raw_kss", "label"]).reset_index(drop=True)
+    return df
 
 
 def rldd_analysis(predictor, videos: pd.DataFrame, stride: int = 3, fps: float = 15.0,

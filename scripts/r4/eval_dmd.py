@@ -225,6 +225,7 @@ def main(argv: Optional[list[str]] = None, pipeline_factory=None) -> int:
     ap.add_argument("--eye_model", help=".onnx or .pt")
     ap.add_argument("--videos_dir", help="folder with DMD *_face.mp4 drowsiness videos")
     ap.add_argument("--events", help="R2 events CSV (session_id, subject_id, kaggle_split, native_label, start_frame, end_frame)")
+    ap.add_argument("--yawn_events", help="optional R2 merged-yawn CSV; replaces the yawning rows of --events")
     ap.add_argument("--stress_root", help="folder that contains generated_stress/")
     ap.add_argument("--stress_manifest", help="R2 stress_test_manifest_dmd.csv")
     ap.add_argument("--out_dir", default="results/r4/dmd_eval")
@@ -259,6 +260,9 @@ def main(argv: Optional[list[str]] = None, pipeline_factory=None) -> int:
 
     if args.videos_dir and args.events:
         events = pd.read_csv(args.events, dtype={"subject_id": str})
+        if args.yawn_events:   # R2 keeps merged yawns in a separate file; use them instead of the raw phases
+            ye = pd.read_csv(args.yawn_events, dtype={"subject_id": str})
+            events = pd.concat([events[~events["native_label"].str.startswith("yawning/")], ye], ignore_index=True)
         videos = find_face_videos(args.videos_dir)
         sessions = sorted(set(events["session_id"]) & set(videos))
         missing = sorted(set(events["session_id"]) - set(videos))
