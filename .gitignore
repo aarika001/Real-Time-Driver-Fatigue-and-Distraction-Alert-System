@@ -1,5 +1,21 @@
 processed_rldd/
 .venv/
+driver_monitor/venv/
 
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
 
+# OS files
+.DS_Store
 
+# Datasets and model outputs
+data/
+datasets/
+checkpoints/
+runs/
+*.pt
+*.pth
+*.npz

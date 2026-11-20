@@ -1,0 +1,46 @@
+session_id,source_task,kaggle_split,group,subject_id,session,record_time,setup,weather,annotated_frames,face_camera_frames,body_frame_shift,hands_frame_shift,face_mp4_mb,body_mp4_mb,hands_mp4_mb,mosaic_avi_mb,annotation_files,uploader_label_drowsy,uploader_label_yawn,uploader_label_head_away,uploader_label_phone_use,uploader_label_other_distraction
+gA_1_s5_2019-03-14T14_26_17_01_00,drowsiness,test,gA,1,s5,2019-03-14T14:26:17+01:00,Car Stopped,Rainy,5481,5480,54,74,359,352,,119,drowsiness.json,1,0,0,0,0
+gA_1_s6_2019-03-08T09_15_15_01_00,gaze,test,gA,1,s6,2019-03-08T09:15:15+01:00,Car Stopped,Rainy,5340,5340,7,16,345,341,345,135,gaze.json + hands.json,0,0,1,0,0
+gA_5_s5_2019-03-13T09_06_49_01_00,drowsiness,test,gA,5,s5,2019-03-13T09:06:49+01:00,Car Stopped,Cloudy,5287,5287,17,26,346,343,,159,drowsiness.json,1,0,0,0,0
+gA_5_s6_2019-03-08T10_40_35_01_00,gaze,test,gA,5,s6,2019-03-08T10:40:35+01:00,Car Moving,Rainy,5957,5957,11,19,390,384,386,182,gaze.json + hands.json,0,0,1,0,0
+gB_10_s5_2019-03-12T10_35_20_01_00,drowsiness,validation,gB,10,s5,2019-03-12T10:35:20+01:00,Car Stopped,Cloudy,6055,6055,2,11,396,394,,112,drowsiness.json,1,0,0,0,0
+gB_10_s5_2019-03-13T14_17_28_01_00,drowsiness,validation,gB,10,s5,2019-03-13T14:17:28+01:00,Car Stopped,Sunny,5417,5417,37,21,352,354,,100,drowsiness.json,1,0,0,0,0
+gB_10_s6_2019-03-11T15_11_03_01_00,gaze,validation,gB,10,s6,2019-03-11T15:11:03+01:00,Car Stopped,Sunny,5711,5682,12,32,369,371,367,100,gaze.json + hands.json,0,0,1,0,0
+gB_6_s5_2019-03-13T13_37_11_01_00,drowsiness,test,gB,6,s5,2019-03-13T13:37:11+01:00,Car Stopped,Rainy,5410,5410,11,19,352,348,,149,drowsiness.json,1,0,0,0,0
+gB_7_s5_2019-03-13T13_55_52_01_00,drowsiness,test,gB,7,s5,2019-03-13T13:55:52+01:00,Car Stopped,Sunny,5405,5405,8,18,352,352,,157,drowsiness.json,1,0,0,0,0
+gB_7_s6_2019-03-11T14_08_04_01_00,gaze,test,gB,7,s6,2019-03-11T14:08:04+01:00,Car Stopped,Sunny,5892,5892,14,36,385,385,384,136,gaze.json + hands.json,0,0,1,0,0
+gB_9_s5_2019-03-07T16_31_48_01_00,drowsiness,validation,gB,9,s5,2019-03-07T16:31:48+01:00,Car Stopped,Sunny,5292,5292,20,36,348,345,,108,drowsiness.json,1,0,0,0,0
+gB_9_s6_2019-03-07T16_16_22_01_00,gaze,validation,gB,9,s6,2019-03-07T16:16:22+01:00,Car Stopped,Sunny,5879,5879,8,24,381,382,382,101,gaze.json + hands.json,0,0,1,0,0
+gC_13_s1_2019-03-04T10_26_12_01_00,distraction,validation,gC,13,s1,2019-03-04T10:26:12+01:00,Car Moving,Cloudy,7166,7166,4,10,463,461,459,290,distraction.json,0,0,0,,1
+gC_13_s2_2019-03-04T10_11_37_01_00,distraction,validation,gC,13,s2,2019-03-04T10:11:37+01:00,Car Stopped,Sunny,12215,12215,2,22,785,788,785,331,distraction.json,0,0,0,1,1
+gC_13_s3_2019-03-12T10_06_34_01_00,distraction,validation,gC,13,s3,2019-03-12T10:06:34+01:00,Car Stopped,Sunny,1814,1814,1,8,120,121,120,53,distraction.json,0,0,0,,1
+gC_13_s5_2019-03-12T10_03_00_01_00,drowsiness,validation,gC,13,s5,2019-03-12T10:03:00+01:00,Car Stopped,Cloudy,5380,5380,5,11,348,347,,149,drowsiness.json,1,0,0,0,0
+gC_13_s6_2019-03-04T10_06_53_01_00,gaze,validation,gC,13,s6,2019-03-04T10:06:53+01:00,Car Stopped,Cloudy,5582,5582,2,13,361,361,362,108,gaze.json + hands.json,0,0,1,0,0
+gC_14_s1_2019-03-04T11_56_20_01_00,distraction,validation,gC,14,s1,2019-03-04T11:56:20+01:00,Car Moving,Cloudy,6682,6681,4,34,436,432,430,273,distraction.json,0,0,0,,1
+gC_14_s2_2019-03-04T11_48_02_01_00,distraction,validation,gC,14,s2,2019-03-04T11:48:02+01:00,Car Stopped,Sunny,11922,11922,4,26,767,768,764,315,distraction.json,0,0,0,1,1
+gC_14_s3_2019-03-12T09_23_37_01_00,distraction,validation,gC,14,s3,2019-03-12T09:23:37+01:00,Car Stopped,Sunny,1934,1934,5,11,127,128,127,54,distraction.json,0,0,0,,1
+gC_14_s5_2019-03-12T09_18_58_01_00,drowsiness,validation,gC,14,s5,2019-03-12T09:18:58+01:00,Car Stopped,Cloudy,5576,5576,2,7,362,362,,137,drowsiness.json,1,0,0,0,0
+gC_14_s6_2019-03-04T11_43_03_01_00,gaze,validation,gC,14,s6,2019-03-04T11:43:03+01:00,Car Stopped,Cloudy,6719,6719,4,10,437,438,437,147,gaze.json + hands.json,0,0,1,0,0
+gE_28_s1_2019-03-15T10_23_30_01_00,distraction,train,gE,28,s1,2019-03-15T10:23:30+01:00,Car Moving,Cloudy,6898,6898,4,43,445,446,444,275,distraction.json,0,0,0,,1
+gE_28_s2_2019-03-15T10_12_30_01_00,distraction,train,gE,28,s2,2019-03-15T10:12:30+01:00,Car Stopped,Cloudy,14402,14402,4,25,925,924,925,387,distraction.json,0,0,0,1,1
+gE_28_s6_2019-03-15T10_06_08_01_00,gaze,train,gE,28,s6,2019-03-15T10:06:08+01:00,Car Stopped,Cloudy,6047,6046,5,17,392,395,393,120,gaze.json + hands.json,0,0,1,0,0
+gE_29_s1_2019-03-15T13_58_00_01_00,distraction,train,gE,29,s1,2019-03-15T13:58:00+01:00,Car Moving,Cloudy,7188,7187,3,20,463,464,461,327,distraction.json,0,0,0,,1
+gE_29_s2_2019-03-15T13_42_24_01_00,distraction,train,gE,29,s2,2019-03-15T13:42:24+01:00,Car Stopped,Cloudy,14083,14083,1,141,907,907,898,394,distraction.json,0,0,0,1,1
+gE_29_s3_2019-03-15T13_54_40_01_00,distraction,train,gE,29,s3,2019-03-15T13:54:40+01:00,Car Stopped,Cloudy,1710,1709,3,34,113,114,112,47,distraction.json,0,0,0,,1
+gE_29_s5_2019-03-15T13_51_09_01_00,drowsiness,train,gE,29,s5,2019-03-15T13:51:09+01:00,Car Stopped,Cloudy,5363,5362,5,19,349,350,,132,drowsiness.json,1,0,0,0,0
+gE_29_s6_2019-03-15T13_37_42_01_00,gaze,train,gE,29,s6,2019-03-15T13:37:42+01:00,Car Stopped,Cloudy,5931,5930,5,30,385,387,388,122,gaze.json + hands.json,0,0,1,0,0
+gF_23_s5_2019-03-11T10_19_19_01_00,drowsiness,train,gF,23,s5,2019-03-11T10:19:19+01:00,Car Stopped,Cloudy,6173,6172,14,24,404,398,,154,drowsiness.json,1,0,0,0,0
+gF_23_s5_2019-03-14T13_49_53_01_00,drowsiness,train,gF,23,s5,2019-03-14T13:49:53+01:00,Car Stopped,Cloudy,5744,5743,8,35,372,372,,126,drowsiness.json,1,0,0,0,0
+gF_23_s6_2019-03-04T16_04_39_01_00,gaze,train,gF,23,s6,2019-03-04T16:04:39+01:00,Car Stopped,Cloudy,6117,6113,16,36,395,397,398,116,gaze.json + hands.json,0,0,1,0,0
+gF_23_s6_2019-03-05T10_05_07_01_00,gaze,train,gF,23,s6,2019-03-05T10:05:07+01:00,Car Stopped,Cloudy,6028,6026,11,33,390,391,389,120,gaze.json + hands.json,0,0,1,0,0
+gZ_33_s5_2019-04-04T09_29_07_02_00,drowsiness,train,gZ,33,s5,2019-04-04T09:29:07+02:00,Car Stopped,Sunny,5407,5407,10,19,351,352,,121,drowsiness.json,1,0,0,0,0
+gZ_33_s5_2019-04-04T15_02_29_02_00,drowsiness,train,gZ,33,s5,2019-04-04T15:02:29+02:00,Car Stopped,Cloudy,5618,5618,2,35,366,367,,122,drowsiness.json,1,0,0,0,0
+gZ_33_s6_2019-04-04T09_36_00_02_00,gaze,train,gZ,33,s6,2019-04-04T09:36:00+02:00,Car Stopped,Sunny,5916,5916,14,19,385,383,384,125,gaze.json + hands.json,0,0,1,0,0
+gZ_33_s6_2019-04-04T15_08_13_02_00,gaze,train,gZ,33,s6,2019-04-04T15:08:13+02:00,Car Stopped,Cloudy,6206,6206,2,16,404,404,404,130,gaze.json + hands.json,0,0,1,0,0
+gZ_36_s5_2019-04-09T10_49_32_02_00,drowsiness,train,gZ,36,s5,2019-04-09T10:49:32+02:00,Car Stopped,Sunny,5414,5414,1,12,354,353,,124,drowsiness.json,1,0,0,0,0
+gZ_36_s6_2019-04-09T10_35_56_02_00,gaze,train,gZ,36,s6,2019-04-09T10:35:56+02:00,Car Stopped,Cloudy,5318,5318,4,26,347,348,347,108,gaze.json + hands.json,0,0,1,0,0
+gZ_37_s1_2019-04-08T15_56_41_02_00,distraction,train,gZ,37,s1,2019-04-08T15:56:41+02:00,Car Moving,Cloudy,6872,6872,8,16,450,446,444,284,distraction.json,0,0,0,,1
+gZ_37_s2_2019-04-08T15_45_15_02_00,distraction,train,gZ,37,s2,2019-04-08T15:45:15+02:00,Car Stopped,Sunny,13070,13070,4,11,845,842,841,326,distraction.json,0,0,0,1,1
+gZ_37_s3_2019-04-29T12_10_11_02_00,distraction,train,gZ,37,s3,2019-04-29T12:10:11+02:00,Car Stopped,Sunny,1839,1839,5,11,122,121,121,45,distraction.json,0,0,0,,1
+gZ_37_s5_2019-04-29T12_06_35_02_00,drowsiness,train,gZ,37,s5,2019-04-29T12:06:35+02:00,Car Stopped,Sunny,5204,5204,2,9,340,338,,109,drowsiness.json,1,0,0,0,0
+gZ_37_s6_2019-04-08T15_52_59_02_00,gaze,train,gZ,37,s6,2019-04-08T15:52:59+02:00,Car Stopped,Cloudy,5376,5376,5,12,350,351,350,104,gaze.json + hands.json,0,0,1,0,0

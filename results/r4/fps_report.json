@@ -1,0 +1,19 @@
+{
+  "frames": 4817,
+  "wall_seconds": 167.68,
+  "fps_overall": 28.73,
+  "machine": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "python": "3.12.4",
+  "landmarks_ms_mean": 17.85,
+  "landmarks_ms_p95": 20.78,
+  "crops_ms_mean": 1.22,
+  "crops_ms_p95": 1.68,
+  "eye_cnn_ms_mean": 3.52,
+  "eye_cnn_ms_p95": 4.17,
+  "mouth_ms_mean": 0.18,
+  "mouth_ms_p95": 0.24,
+  "total_ms_mean": 22.77,
+  "total_ms_p95": 25.98,
+  "fps_processing_only": 43.9,
+  "eye_model": "runs/eye_cnn/eye_cnn.onnx"
+}

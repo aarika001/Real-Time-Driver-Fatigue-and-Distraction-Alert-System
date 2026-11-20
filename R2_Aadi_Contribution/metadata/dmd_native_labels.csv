@@ -1,0 +1,49 @@
+source,annotation_file,label_group,native_label,sessions_with_label,intervals,annotated_frames,proposed_project_label,mapping_status,notes
+dmd_kaggle_v1,distraction,driver_actions,drinking,5,23,3127,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,hair_and_makeup,6,29,4679,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,phonecall_left,5,10,12742,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,phonecall_right,5,10,11440,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,radio,5,25,3654,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,reach_backseat,4,8,1327,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,reach_side,14,165,11361,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,safe_drive,14,241,42236,alert,Not used in current implementation; mapping kept for later (decisions 4 and 5),Driving with no annotated secondary action
+dmd_kaggle_v1,distraction,driver_actions,standstill_or_waiting,1,2,265,exclude,Not used in current implementation; mapping kept for later (decisions 4 and 5),Not a defined behaviour
+dmd_kaggle_v1,distraction,driver_actions,talking_to_passenger,5,81,2614,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,texting_left,5,14,5001,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,texting_right,5,14,5088,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Secondary task
+dmd_kaggle_v1,distraction,driver_actions,unclassified,14,90,4189,exclude,Not used in current implementation; mapping kept for later (decisions 4 and 5),Not a defined behaviour
+dmd_kaggle_v1,distraction,gaze_on_road,looking_road,14,577,85900,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Context only
+dmd_kaggle_v1,distraction,gaze_on_road,not_looking_road,14,564,21892,distraction,Not used in current implementation; mapping kept for later (decisions 4 and 5),Eyes-off-road cue
+dmd_kaggle_v1,distraction,hand_on_gear,hand_on_gear,3,5,98,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,distraction,hands_using_wheel,both,14,176,41986,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,distraction,hands_using_wheel,none,12,32,1862,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,distraction,hands_using_wheel,only_left,14,143,43106,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,distraction,hands_using_wheel,only_right,10,45,20423,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,distraction,talking,talking,10,292,13948,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,drowsiness,blinks,blinking,16,1635,31585,none,Native feature kept; no project label (decision 7),Blink feature for PERCLOS or blink rate
+dmd_kaggle_v1,drowsiness,eyes_state,close,16,285,8827,fatigue,Adopted 2026-11-15 as fatigue cue event (decision 7),Eye-closure cue only; not a drowsiness state label
+dmd_kaggle_v1,drowsiness,eyes_state,closing,16,1936,10087,none,Native feature kept; no project label (decision 7),Eye-state feature
+dmd_kaggle_v1,drowsiness,eyes_state,open,16,1651,56475,none,Native feature kept; no project label (decision 7),Eye-state feature
+dmd_kaggle_v1,drowsiness,eyes_state,opening,16,1936,12639,none,Native feature kept; no project label (decision 7),Eye-state feature
+dmd_kaggle_v1,drowsiness,eyes_state,undefined,6,10,194,exclude,Native feature kept; no project label (decision 7),Eye state not judged
+dmd_kaggle_v1,drowsiness,yawning,Yawning with hand,16,38,6244,fatigue,Adopted 2026-11-15 as fatigue cue event (decision 7),Yawn event; with-hand variant has mouth occlusion
+dmd_kaggle_v1,drowsiness,yawning,Yawning without hand,16,47,6183,fatigue,Adopted 2026-11-15 as fatigue cue event (decision 7),Yawn event; with-hand variant has mouth occlusion
+dmd_kaggle_v1,gaze,blinks,blinking,15,1019,10621,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Blink feature for PERCLOS or blink rate
+dmd_kaggle_v1,gaze,gaze_zone,center_mirror,15,20,3446,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,front,15,46,5009,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,front_right,15,21,3777,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,infotainment,15,17,3478,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,left,15,15,3075,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,left_mirror,15,17,3941,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,not_valid,15,16,54184,exclude,Not used in current implementation; mapping kept for later (decisions 4 and 5),Gaze not valid
+dmd_kaggle_v1,gaze,gaze_zone,right,15,15,3357,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,right_mirror,15,17,3446,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,gaze,gaze_zone,steering_wheel,15,23,4269,gaze_region,Not used in current implementation; mapping kept for later (decisions 4 and 5),Keep gaze zone separate from project labels
+dmd_kaggle_v1,hands,hands_on_wheel,both_hands,15,140,34386,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,hands_on_wheel,none,15,76,23444,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,hands_on_wheel,only_left,15,63,16422,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,hands_on_wheel,only_right,15,63,13606,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,moving_hands,moving,15,304,32940,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,moving_hands,not_moving,15,317,54918,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,transition,giving control,15,68,1264,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
+dmd_kaggle_v1,hands,transition,taking control,15,59,1629,none,Not used in current implementation; mapping kept for later (decisions 4 and 5),Hands and wheel context
